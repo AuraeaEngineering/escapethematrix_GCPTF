@@ -21,21 +21,32 @@ resource "google_storage_bucket" "exit-the-matrix-bucket1" {
   location      = "us-central1"
   force_destroy = true
 
-  lifecycle_rule {
-    condition {
-      age = 3
-    }
-    action {
-      type = "Delete"
-    }
-  }
-
-  lifecycle_rule {
-    condition {
-      age = 1
-    }
-    action {
-      type = "AbortIncompleteMultipartUpload"
-    }
-  }
+ 
 }
+
+
+resource "google_compute_network" "auto-vpc-tf" {
+  name                    = "auto-vpc-tf"
+  auto_create_subnetworks = false
+}
+
+resource "google_compute_subnetwork" "sub-sg" {
+  name          = "sub-sg"
+  network       = google_compute_network.auto-vpc-tf.id
+  ip_cidr_range = "10.72.1.0/24"
+  region        = "asia-northeast1"
+}
+
+
+#resource "google_compute_network" "custom-vpc-tf" {
+#name = "custom-vpc-tf"
+#auto_create_subnetworks = false
+#}
+
+output "auto" {
+  value = google_compute_network.auto-vpc-tf.id
+}
+
+#output "custom" {
+#  value = google_compute_network.custom-vpc-tf.id
+#}
